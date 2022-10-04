@@ -1,28 +1,21 @@
-const http = require('http');
-const fs = require('fs');
-const server = http.createServer((req,res) => {
-    const url = req.url;
-    const method = req.method;
-    if(req.url === '/'){
-        res.write('<html>');
-        res.write('<head><title>Enter Message</title></head>')
-        res.write('<body><form action="/message" method="POST"><input type="text" name="message"></input></form></body>')
-        res.write('</html>');
-        return res.end();
-    }
-    if(url === '/message' && method === 'POST') {
-        const body = [];
-        req.on('data', (chunk) => {
-            console.log(chunk);
-            body.push(chunk);
-        })
-        req.on('end', () => {
-            const parsedBody = Buffer.concat(body).toString();
-            const message = parsedBody.split('=')[1];
-            fs.writeFileSync('formMessage.txt', message);
-        })
-        return res.end();
-    }
+const express = require('express');
+const app = express();
+const PORT = 3000
+
+// app.get('/', (req,res) => {
+//     res.send('Hello World')
+// })
+
+app.use((req,res,next) => {
+    console.log('In a middleware!');
+    next();
 })
 
-server.listen(3000);
+app.use((req,res,next) => {
+    console.log('In another middleware!')
+    res.send('Hello World');
+})
+
+app.listen(PORT, () => {
+    console.log(`Listening on PORT: ${PORT}`);
+})
